@@ -1,6 +1,6 @@
 # System Architecture
 
-> **Scope note:** This document describes the full designed architecture, including services scaffolded in code but not part of the verified, runnable local stack. The verified `backend/docker-compose.local.yml` stack is exactly 8 containers: `postgres`, `api`, `prediction`, `workflow`, `n8n`, `temporal`, `temporal-ui`, `temporal-worker`. The **Training Service, LLM Service (Azure OpenAI), MLflow, and Redis** described below exist as code/interfaces but are not wired into that verified stack — there is no MLflow tracking URI or Azure OpenAI config in `backend/.env.example`, and the prediction service runs from a bundled model file rather than an MLflow registry. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
+> **Scope note:** This document describes the full designed architecture, including services scaffolded in code but not part of the verified, runnable local stack. The verified `backend/docker-compose.local.yml` stack is exactly 8 containers: `postgres`, `api`, `prediction`, `workflow`, `n8n`, `temporal`, `temporal-ui`, `temporal-worker`. The **Training Service, LLM Service (Azure OpenAI), MLflow, and Redis** described below exist as code/interfaces but are not wired into that verified stack - there is no MLflow tracking URI or Azure OpenAI config in `backend/.env.example`, and the prediction service runs from a bundled model file rather than an MLflow registry. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
 
 ## 1. Architecture Overview
 
@@ -215,12 +215,12 @@ flowchart LR
 
 **Key Components:**
 
-- `PredictionPanel` — Displays risk score with gauge + model version + confidence
-- `ShapForcePlot` — Interactive SHAP waterfall/summary plot (React + D3)
-- `ModelComparisonChart` — Side-by-side metric comparison
-- `WorkflowTimeline` — Visual workflow execution trace
-- `ExperimentTable` — Paginated MLflow experiment list with search/filter
-- `AuditLogTable` — Searchable audit log viewer (admin only)
+- `PredictionPanel` - Displays risk score with gauge + model version + confidence
+- `ShapForcePlot` - Interactive SHAP waterfall/summary plot (React + D3)
+- `ModelComparisonChart` - Side-by-side metric comparison
+- `WorkflowTimeline` - Visual workflow execution trace
+- `ExperimentTable` - Paginated MLflow experiment list with search/filter
+- `AuditLogTable` - Searchable audit log viewer (admin only)
 
 **State Management:**
 
@@ -603,7 +603,7 @@ graph TB
 **Temporal Workflow: Care Coordination**
 
 ```python
-# Pseudocode — the actual durable workflow
+# Pseudocode - the actual durable workflow
 async def CareCoordinationWorkflow(ctx: WorkflowContext, patient_id: str, risk_score: float):
     # Step 1: Check for existing active care plan
     existing = await lookup_active_care_plan(patient_id)
@@ -946,7 +946,7 @@ groups:
         for: 30m
         labels: { severity: warning }
         annotations:
-          summary: "Potential data drift — HIGH risk predictions up {{ $value | humanize }}x"
+          summary: "Potential data drift - HIGH risk predictions up {{ $value | humanize }}x"
 
   - name: workflow
     rules:

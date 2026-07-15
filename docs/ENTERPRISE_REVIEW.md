@@ -1,12 +1,12 @@
 # Enterprise Architecture Review
 
-> **Scope note:** This document describes a *designed*, larger-scale target architecture — its own closing section states "Next phase: Implementation." It does not describe the verified v1.0 system. Concretely, the verified codebase uses a 12-feature model contract (not the 44 features referenced throughout this review), has no Optuna hyperparameter search, no Great Expectations data validation, no continuous retraining pipeline, no batch prediction endpoint, no PagerDuty alerting, and no Grafana cost dashboard. The protocol/interface abstraction layer (Section 1) exists only partially in code (e.g. a `FeatureStoreProtocol`-style interface is present for some adapters), not with the full set of swappable implementations listed here. Treat this document as a proposed future architecture, not current capability. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
+> **Scope note:** This document describes a *designed*, larger-scale target architecture - its own closing section states "Next phase: Implementation." It does not describe the verified v1.0 system. Concretely, the verified codebase uses a 12-feature model contract (not the 44 features referenced throughout this review), has no Optuna hyperparameter search, no Great Expectations data validation, no continuous retraining pipeline, no batch prediction endpoint, no PagerDuty alerting, and no Grafana cost dashboard. The protocol/interface abstraction layer (Section 1) exists only partially in code (e.g. a `FeatureStoreProtocol`-style interface is present for some adapters), not with the full set of swappable implementations listed here. Treat this document as a proposed future architecture, not current capability. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
 
 ## Strengthening Production Readiness, Maintainability, Reliability, and Operational Excellence
 
 **Review Date:** 2026-07-20
-**Scope:** Full architecture audit — no feature additions, no design restructuring
-**Status:** Approved — architecture frozen for implementation
+**Scope:** Full architecture audit - no feature additions, no design restructuring
+**Status:** Approved - architecture frozen for implementation
 
 ---
 
@@ -14,7 +14,7 @@
 
 ## 1.1 Rationale
 
-Every third-party dependency is hidden behind a Python protocol (interface). Business logic imports the protocol, not the vendor SDK. This means any vendor can be replaced by implementing the same protocol — no changes to prediction, training, or workflow code.
+Every third-party dependency is hidden behind a Python protocol (interface). Business logic imports the protocol, not the vendor SDK. This means any vendor can be replaced by implementing the same protocol - no changes to prediction, training, or workflow code.
 
 ## 1.2 Interface Boundaries
 
@@ -59,7 +59,7 @@ class FeatureStoreProtocol(Protocol):
         ...
 ```
 
-**Boundary:** The Prediction Service and Training Service speak only to `FeatureStoreProtocol`. The PostgreSQL implementation is injected at startup via the service container. To swap to Feast, write `FeastFeatureStore(FeatureStoreProtocol)` and change the wiring — zero business logic changes.
+**Boundary:** The Prediction Service and Training Service speak only to `FeatureStoreProtocol`. The PostgreSQL implementation is injected at startup via the service container. To swap to Feast, write `FeastFeatureStore(FeatureStoreProtocol)` and change the wiring - zero business logic changes.
 
 ### 1.2.2 Model Registry Interface
 
@@ -104,7 +104,7 @@ class ModelRegistryProtocol(Protocol):
         ...
 ```
 
-**Boundary:** ADR-003 (MLflow) is updated to reflect that MLflow implements `ModelRegistryProtocol`, not that the system depends on MLflow directly. The Prediction Service loads models through this interface — the underlying registry could be a local filesystem, S3, or Google Cloud Storage without touching inference code.
+**Boundary:** ADR-003 (MLflow) is updated to reflect that MLflow implements `ModelRegistryProtocol`, not that the system depends on MLflow directly. The Prediction Service loads models through this interface - the underlying registry could be a local filesystem, S3, or Google Cloud Storage without touching inference code.
 
 ### 1.2.3 LLM Provider Interface
 
@@ -287,7 +287,7 @@ class ServiceContainer:
 **Decision:** Every third-party integration is hidden behind a Python `Protocol` (interface) defined in a shared `interfaces` module. Business logic imports only the protocol. Implementation classes live in `adapters/` subdirectories. Dependency injection in each service's `container.py` wires implementations at startup based on configuration.
 
 **Consequences:**
-- **Positive:** Any vendor can be replaced by implementing the protocol — zero business logic changes
+- **Positive:** Any vendor can be replaced by implementing the protocol - zero business logic changes
 - **Positive:** Testing: mock protocols directly without vendor SDKs
 - **Positive:** Multiple implementations can coexist (primary + fallback + circuit breaker)
 - **Negative:** One extra abstraction layer per integration
@@ -432,7 +432,7 @@ sequenceDiagram
     MON->>PS: Alert: F1 drop 12%
 
     PS->>PS: Evaluate: degradation > 10%?
-    Note over PS: Yes — trigger rollback
+    Note over PS: Yes - trigger rollback
 
     PS->>MR: Demote current version to 'Archived'
     MR-->>PS: OK
@@ -516,7 +516,7 @@ flowchart LR
 
 ## 3.4 Workflow Recovery After Rollback
 
-When a model rollback occurs, in-flight workflows continue using their already-computed predictions. Subsequent predictions use the rolled-back model. Workflows already executing under the degraded model are not retroactively cancelled — instead, a flag is set:
+When a model rollback occurs, in-flight workflows continue using their already-computed predictions. Subsequent predictions use the rolled-back model. Workflows already executing under the degraded model are not retroactively cancelled - instead, a flag is set:
 
 ```json
 {
@@ -662,7 +662,7 @@ sequenceDiagram
 **Characteristics:**
 - Scheduled (daily/on-demand)
 - Process cohort of patients (100-1000 per batch)
-- Asynchronous — results available in morning
+- Asynchronous - results available in morning
 - SHAP computed for all patients
 - LLM explanation + workflow trigger only for high-risk patients
 - Performance: ~10s per 100 patients (including SHAP)
@@ -783,11 +783,11 @@ flowchart LR
 
 | Checkpoint | Type | Who | Condition |
 |------------|------|-----|-----------|
-| 1. Data validation | Automatic | — | Great Expectations suite passes |
-| 2. Model metrics | Automatic | — | All 6 metric thresholds met |
-| 3. Fairness audit | Automatic | — | ΔF1 across groups ≤ 0.03 |
-| 4. Staging promotion | Automatic | — | Checks 1-3 pass |
-| 5. Shadow run completion | Automatic | — | 7 days without degradation |
+| 1. Data validation | Automatic | - | Great Expectations suite passes |
+| 2. Model metrics | Automatic | - | All 6 metric thresholds met |
+| 3. Fairness audit | Automatic | - | ΔF1 across groups ≤ 0.03 |
+| 4. Staging promotion | Automatic | - | Checks 1-3 pass |
+| 5. Shadow run completion | Automatic | - | 7 days without degradation |
 | 6. Production promotion | Automatic + Manual | ML Engineer | Check 5 passes + manual approval recorded |
 
 ## 5.4 Rollback During Retraining
@@ -963,15 +963,15 @@ Every data artifact records its provenance:
 | Model versions | Indefinite (registry) | Unused staging models → 90 days | Manual | Model provenance |
 | Audit logs | 12 months (partitioned) | 12-84 months | 84 months + 30 days | HIPAA compliance |
 | Feature store | 6 months | 6-24 months | 24 months + 30 days | Retraining |
-| Raw inference logs | 30 days | — | 30 days | Debugging only |
-| User sessions | 7 days (Redis) | — | 7 days | Operational |
+| Raw inference logs | 30 days | - | 30 days | Debugging only |
+| User sessions | 7 days (Redis) | - | 7 days | Operational |
 
 ## 7.4 Deletion Policies
 
 | Type | Soft Delete | Hard Delete | Approval Required |
 |------|-------------|-------------|-------------------|
 | Patient record | `is_active = false` | After retention period | Clinical admin |
-| Single prediction | Not supported | Not supported | — |
+| Single prediction | Not supported | Not supported | - |
 | Model version | `stage = 'Archived'` | Manual with approval | ML Engineer + Clinical Lead |
 | User account | `is_active = false` | After 90 days | System admin |
 | Audit log | Not supported | After retention | Legal + Security |
@@ -1025,7 +1025,7 @@ Every data artifact records its provenance:
 | `GET /patients/{id}` | < 50ms | < 200ms | < 400ms | Single row lookup |
 | `POST /predict` (real-time) | < 1s | < 3s | < 5s | Full pipeline: features → inference → SHAP → LLM |
 | `POST /predict` (no LLM) | < 500ms | < 1.5s | < 3s | Features → inference → SHAP only |
-| `POST /predict/batch` (100 patients) | — | < 30s | < 60s | End-to-end batch |
+| `POST /predict/batch` (100 patients) | - | < 30s | < 60s | End-to-end batch |
 | `GET /models` | < 100ms | < 300ms | < 500ms | Registry query |
 | `GET /dashboard/summary` | < 200ms | < 500ms | < 1s | Aggregation queries |
 
@@ -1038,8 +1038,8 @@ Every data artifact records its provenance:
 | SHAP computation | < 150ms | < 300ms | SHAP (TreeExplainer) |
 | LLM explanation | < 500ms | < 2s | Azure OpenAI |
 | Workflow trigger | < 100ms | < 500ms | Workflow Service |
-| Total (with LLM) | < 800ms | < 3s | — |
-| Total (without LLM) | < 300ms | < 1s | — |
+| Total (with LLM) | < 800ms | < 3s | - |
+| Total (without LLM) | < 300ms | < 1s | - |
 
 ### 8.1.3 Workflow Completion
 
@@ -1058,11 +1058,11 @@ Every data artifact records its provenance:
 |---------|------------|----------------------|------------|
 | API Gateway | 99.95% | 21.6 min | Azure Container Apps |
 | Prediction Service | 99.9% | 43.2 min | Model Registry, Feature Store |
-| Training Service | 99.5% | 3.6 hours | (Lower priority — retraining is offline) |
+| Training Service | 99.5% | 3.6 hours | (Lower priority - retraining is offline) |
 | LLM Service | 99.0% | 7.2 hours | Azure OpenAI (degraded acceptable) |
 | Workflow Service | 99.9% | 43.2 min | Temporal, n8n |
 | PostgreSQL | 99.95% | 21.6 min | Azure Flexible Server (HA mode) |
-| MLflow | 99.5% | 3.6 hours | (Cached locally — stale acceptable) |
+| MLflow | 99.5% | 3.6 hours | (Cached locally - stale acceptable) |
 | Frontend | 99.9% | 43.2 min | Azure Container Apps + CDN |
 | **Overall Platform** | **99.8%** | **86.4 min** | Single point of failure: API Gateway |
 
@@ -1101,7 +1101,7 @@ Every data artifact records its provenance:
 | Training Service | 1 | 2 | 5 concurrent (long-running) |
 | LLM Service | 2 | 5 | 20 concurrent (API-limited) |
 | Workflow Service | 2 | 5 | 50 concurrent |
-| PostgreSQL | 2 (HA pair) | — | 200 pooled connections |
+| PostgreSQL | 2 (HA pair) | - | 200 pooled connections |
 
 ## 8.6 Storage Projections
 
@@ -1162,12 +1162,12 @@ Every data artifact records its provenance:
 
 | Artifact Type | Hot Tier | Cool Tier | Delete | Automation |
 |---------------|----------|-----------|--------|------------|
-| MLflow staging models (< 30 days) | Azure Blob Hot | — | After 30 days or rejection | Automated cleanup job |
-| MLflow archived models | — | Azure Blob Cool (30-90 days) | After 90 days | Lifecycle management rule |
-| Old model artifacts (> 90 days) | — | Azure Blob Archive | After 365 days | Lifecycle management rule |
-| Stale feature snapshots (< 6 months) | Hot | — | After 6 months | Weekly cleanup |
-| Audit log partitions (> 12 months) | — | Azure Blob Cool | After 84 months | Partition detach + export |
-| Batch prediction CSVs | — | — | After 7 days | Tmp file cleanup |
+| MLflow staging models (< 30 days) | Azure Blob Hot | - | After 30 days or rejection | Automated cleanup job |
+| MLflow archived models | - | Azure Blob Cool (30-90 days) | After 90 days | Lifecycle management rule |
+| Old model artifacts (> 90 days) | - | Azure Blob Archive | After 365 days | Lifecycle management rule |
+| Stale feature snapshots (< 6 months) | Hot | - | After 6 months | Weekly cleanup |
+| Audit log partitions (> 12 months) | - | Azure Blob Cool | After 84 months | Partition detach + export |
+| Batch prediction CSVs | - | - | After 7 days | Tmp file cleanup |
 
 ## 9.6 Infrastructure Scaling Policies
 
@@ -1194,7 +1194,7 @@ Every data artifact records its provenance:
 | Temporal Server | Included (Docker) | Included (Docker) |
 | Monitoring (Grafana Cloud) | Free tier | $100/month |
 | GitHub Actions | Free (public) | $50/month |
-| Azure Front Door | — | $100/month |
+| Azure Front Door | - | $100/month |
 | **TOTAL** | **~$480/month** | **~$3,500-4,000/month** |
 
 ---
@@ -1216,7 +1216,7 @@ Every architectural claim is cross-referenced across all documents. Conflicts an
 | 7 | API latency targets in ARCHITECTURE.md §7 are less detailed than Review §8 | ARCHITECTURE.md §7, Review §8 | Resolved: Review §8 supersedes with breakdown; ARCHITECTURE.md §7 kept as summary |
 | 8 | Environment variable names differ between DEPLOYMENT_GUIDE.md and container.py examples | DEPLOYMENT_GUIDE.md, Review §1.3 | Aligned to `$SERVICE_VARIABLE` convention |
 | 9 | n8n workflow names differ between ARCHITECTURE.md and WORKFLOWS.md | ARCHITECTURE.md, WORKFLOWS.md | Standardized: `care-coordination`, `notify-physician`, `send-reminder`, `escalation-handler` |
-| 10 | Model card evaluation metrics (test set) vs. promotion thresholds | MODEL_CARD.md, Review §2 | Resolved: model card reports actuals; promotion checks thresholds — they are different numbers by design |
+| 10 | Model card evaluation metrics (test set) vs. promotion thresholds | MODEL_CARD.md, Review §2 | Resolved: model card reports actuals; promotion checks thresholds - they are different numbers by design |
 | 11 | Training service port: 8002 in ARCHITECTURE.md, 8002 in DEVELOPER_ONBOARDING.md | ARCHITECTURE.md, DEVELOPER_ONBOARDING.md | Verified consistent |
 | 12 | Batch inference reporting: no report format defined | Review §4.2 (new) | Added batch report schema |
 | 13 | Audit log partition retention: 12 months in DATA_MODEL.md, 7 years in Review §7.3 | DATA_MODEL.md, Review §7.3 | Resolved: 12 months hot (partitioned in PostgreSQL), 7 years cold (archived to Blob) |
@@ -1291,6 +1291,6 @@ After the complete review, the following architectural invariants hold across al
 
 The architecture is now **frozen**. All 12 ADRs, all 11 documents, all 10 enterprise review dimensions, and all 15 consistency findings are resolved and documented.
 
-**Next phase:** Implementation. Begin with protocol interface definitions, then service containers, then business logic — no further architectural changes without a formal Architecture Review Board meeting.
+**Next phase:** Implementation. Begin with protocol interface definitions, then service containers, then business logic - no further architectural changes without a formal Architecture Review Board meeting.
 
 ---

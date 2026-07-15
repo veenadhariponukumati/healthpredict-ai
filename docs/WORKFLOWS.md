@@ -33,7 +33,7 @@ sequenceDiagram
     WKR->>DB: Check for existing active care plan
 
     alt Active care plan exists
-        WKR->>WKR: Skip — duplicate prevention
+        WKR->>WKR: Skip - duplicate prevention
         WKR->>WKR: Log "Existing care plan found"
     else No active care plan
         WKR->>DB: CREATE care_episode
@@ -90,7 +90,7 @@ sequenceDiagram
     WKR->>WKR: Load dataset version config
     WKR->>WKR: Check if training slot available
     alt Training already in progress
-        WKR->>WKR: Skip — deduplication
+        WKR->>WKR: Skip - deduplication
         WKR->>DB: Log skipped run
     else
         WKR->>TS: POST /training/start

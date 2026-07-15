@@ -9,7 +9,7 @@
 |----------|-------|---------|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API base URL |
 
-Only one variable is needed. **`.env.local` is not included in the package** — you must create it yourself if you want to set this explicitly:
+Only one variable is needed. **`.env.local` is not included in the package** - you must create it yourself if you want to set this explicitly:
 ```bash
 echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > frontend/.env.local
 ```
@@ -45,7 +45,7 @@ npx playwright test
 ```
 
 ## Docker Instructions
-The frontend is NOT added to docker-compose.local.yml — it runs standalone on port 3000. To add it:
+The frontend is NOT added to docker-compose.local.yml - it runs standalone on port 3000. To add it:
 1. Add a `frontend` service in docker-compose.local.yml
 2. The existing `api` service on port 8000 serves as the backend
 
@@ -55,15 +55,15 @@ The frontend is NOT added to docker-compose.local.yml — it runs standalone on 
 ## Files Added or Modified
 
 ### Modified (API contract fixes):
-- `frontend/src/types/api.ts` — Updated `DashboardSummary`, `WorkflowStats`, `PredictionDetail` to match real backend
-- `frontend/src/services/api.ts` — Rewritten with correct types; `getStats` now returns `WorkflowStats`, `getDashboard` now returns `DashboardSummary`
-- `frontend/src/app/dashboard/page.tsx` — Removed obsolete fields (`total_patients`, `high_risk_count`, `active_workflows`, `completed_workflows`, `failed_workflows`, `low_risk_count`, `workflow_completion_rate`). Uses actual backend fields: `total_predictions`, `high_risk`, `critical`, `moderate`, `mean_risk_score`, `current_model`, `current_model_version`
-- `frontend/src/app/predictions/[id]/page.tsx` — Replaced `shap_explanation.top_features` with `shap_values` (sorted by absolute value, top 10). Raw SHAP values grid reads directly from `shap_values` dict
-- `frontend/src/app/workflows/page.tsx` — Replaced `stats.active` with `stats.running`. Added `retrying` and `escalated` to chart. `completion_rate` now computed as ratio of completed/total
+- `frontend/src/types/api.ts` - Updated `DashboardSummary`, `WorkflowStats`, `PredictionDetail` to match real backend
+- `frontend/src/services/api.ts` - Rewritten with correct types; `getStats` now returns `WorkflowStats`, `getDashboard` now returns `DashboardSummary`
+- `frontend/src/app/dashboard/page.tsx` - Removed obsolete fields (`total_patients`, `high_risk_count`, `active_workflows`, `completed_workflows`, `failed_workflows`, `low_risk_count`, `workflow_completion_rate`). Uses actual backend fields: `total_predictions`, `high_risk`, `critical`, `moderate`, `mean_risk_score`, `current_model`, `current_model_version`
+- `frontend/src/app/predictions/[id]/page.tsx` - Replaced `shap_explanation.top_features` with `shap_values` (sorted by absolute value, top 10). Raw SHAP values grid reads directly from `shap_values` dict
+- `frontend/src/app/workflows/page.tsx` - Replaced `stats.active` with `stats.running`. Added `retrying` and `escalated` to chart. `completion_rate` now computed as ratio of completed/total
 
 ### Added:
-- `frontend/e2e/healthcare.spec.ts` — Playwright E2E tests
-- `frontend/INTEGRATION_README.md` — This file
+- `frontend/e2e/healthcare.spec.ts` - Playwright E2E tests
+- `frontend/INTEGRATION_README.md` - This file
 
 ## Known Limitations
 

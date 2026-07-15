@@ -2,7 +2,7 @@
 
 ## Welcome
 
-Welcome to the Clinical Readmission Prediction & AI Care Coordination Platform team. This guide will help you get your development environment set up and understand the system architecture.
+Welcome to the Clinical Re-admission Prediction & AI Care Co-ordination Platform team. This guide will help you get your development environment set up and understand the system architecture.
 
 ## Prerequisites
 

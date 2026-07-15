@@ -1,12 +1,12 @@
-# Clinical Readmission Prediction & AI Care Coordination Platform
+# Clinical Re-admission Prediction & AI Care Co-ordination Platform
 
 ## Overview
 
-Hospital readmissions within 30 days are a major cost and quality problem for health systems — they trigger CMS reimbursement penalties and often signal gaps in post-discharge care. This platform predicts which patients are at high risk of readmission at discharge time, explains *why* using SHAP, and automatically kicks off a durable, auditable care-coordination workflow (Temporal + n8n) so at-risk patients don't fall through the cracks. All data used is synthetic/demo data — no real patient data is processed.
+Hospital readmissions within 30 days are a major cost and quality problem for health systems - they trigger CMS reimbursement penalties and often signal gaps in post-discharge care. This platform predicts which patients are at high risk of readmission at discharge time, explains *why* using SHAP, and automatically kicks off a durable, auditable care-coordination workflow (Temporal + n8n) so at-risk patients don't fall through the cracks. All data used is synthetic/demo data - no real patient data is processed.
 
-This architecture is designed to the standards of enterprise healthcare technology at scale — Microsoft, Google, Amazon, and Epic-level engineering rigor, with HIPAA-aware patterns, observability, MLOps, and explainable AI throughout.
+This architecture is designed to the standards of enterprise healthcare technology at scale - Microsoft, Google, Amazon, and Epic-level engineering rigor, with HIPAA-aware patterns, observability, MLOps, and explainable AI throughout.
 
-**What's real vs. simulated:** Authentication, RBAC, the prediction pipeline (12-feature model contract), SHAP explanations, audit logging, and the Temporal + n8n workflow orchestration (durable state machine, retries, real HTTP webhook delivery) are fully implemented and verified end-to-end — Temporal orchestration is real, and n8n workflow execution is real. The **final notification step of each workflow is simulated** — n8n's workflows (patient reminders, care-team notifications, and appointment scheduling) all return a hardcoded mock response instead of calling a real SMS/email/scheduling provider (see [Known Limitations](KNOWN_LIMITATIONS.md)). No real text messages, emails, or appointment bookings are sent by this application today.
+**What's real vs. simulated:** Authentication, RBAC, the prediction pipeline (12-feature model contract), SHAP explanations, audit logging, and the Temporal + n8n workflow orchestration (durable state machine, retries, real HTTP webhook delivery) are fully implemented and verified end-to-end - Temporal orchestration is real, and n8n workflow execution is real. The **final notification step of each workflow is simulated** - n8n's workflows (patient reminders, care-team notifications, and appointment scheduling) all return a hardcoded mock response instead of calling a real SMS/email/scheduling provider (see [Known Limitations](KNOWN_LIMITATIONS.md)). No real text messages, emails, or appointment bookings are sent by this application today.
 
 ## Key Features
 
@@ -19,7 +19,7 @@ This architecture is designed to the standards of enterprise healthcare technolo
 
 ## Screenshots
 
-_Add screenshots here before publishing — see the Release Asset Checklist in the project's release notes. Suggested captures: login screen, dashboard, patient list, prediction detail with SHAP chart, workflow detail, audit log._
+_Add screenshots here before publishing - see the Release Asset Checklist in the project's release notes. Suggested captures: login screen, dashboard, patient list, prediction detail with SHAP chart, workflow detail, audit log._
 
 ## Architecture at a Glance
 
@@ -76,16 +76,16 @@ _Add screenshots here before publishing — see the Release Asset Checklist in t
 | Deployment | Azure App Service, Azure Container Apps |
 | Observability | OpenTelemetry, Prometheus, Grafana |
 
-> **Note on this table:** OpenTelemetry and Prometheus instrumentation are wired into the running FastAPI services. The **Azure deployment path, GitHub Actions CI/CD pipeline, and Grafana dashboards** described in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) are a **design document only** — there is no `.github/workflows/`, no IaC (Bicep/Terraform) files, no Grafana dashboard config, and no frontend `Dockerfile` in this repository. Separately, **MLflow, the LLM Service (Azure OpenAI), the Training Service, and Redis** are scaffolded in code but are **not part of the verified local stack** (`backend/docker-compose.local.yml` runs 8 containers and includes none of these four) — the prediction service runs from a bundled model file instead of an MLflow registry, and rate limiting is in-memory rather than Redis-backed. The only deployment/runtime path that has been built and verified end-to-end is local Docker Compose (backend, 8 services) + `npm run dev`/`npm run build` (frontend). See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
+> **Note on this table:** OpenTelemetry and Prometheus instrumentation are wired into the running FastAPI services. The **Azure deployment path, GitHub Actions CI/CD pipeline, and Grafana dashboards** described in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) are a **design document only** - there is no `.github/workflows/`, no IaC (Bicep/Terraform) files, no Grafana dashboard config, and no frontend `Dockerfile` in this repository. Separately, **MLflow, the LLM Service (Azure OpenAI), the Training Service, and Redis** are scaffolded in code but are **not part of the verified local stack** (`backend/docker-compose.local.yml` runs 8 containers and includes none of these four) - the prediction service runs from a bundled model file instead of an MLflow registry, and rate limiting is in-memory rather than Redis-backed. The only deployment/runtime path that has been built and verified end-to-end is local Docker Compose (backend, 8 services) + `npm run dev`/`npm run build` (frontend). See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
 
 ## Key Design Decisions
 
-1. **Service-Oriented Architecture** — Each service is independently deployable, scalable, and testable
-2. **MLflow as Source of Truth** — All experiments, models, and artifacts are tracked; the registry governs promotion
-3. **Temporal + n8n Dual Orchestration** — Temporal for durable, long-running ML workflows; n8n for rapid care coordination automations
-4. **SHAP for Explainability** — Model-agnostic, mathematically grounded explanations at global and patient levels
-5. **LLM as Decision Support Only** — Azure OpenAI never predicts; it only translates model outputs into clinician-friendly language
-6. **HIPAA-Aware by Default** — Encryption at rest and in transit, RBAC, audit logs, synthetic data, least privilege
+1. **Service-Oriented Architecture** - Each service is independently deployable, scalable, and testable
+2. **MLflow as Source of Truth** - All experiments, models, and artifacts are tracked; the registry governs promotion
+3. **Temporal + n8n Dual Orchestration** - Temporal for durable, long-running ML workflows; n8n for rapid care coordination automations
+4. **SHAP for Explainability** - Model-agnostic, mathematically grounded explanations at global and patient levels
+5. **LLM as Decision Support Only** - Azure OpenAI never predicts; it only translates model outputs into clinician-friendly language
+6. **HIPAA-Aware by Default** - Encryption at rest and in transit, RBAC, audit logs, synthetic data, least privilege
 
 ## Documentation Index
 
@@ -130,7 +130,7 @@ npm run dev
 | Clinician | `clinician@test.com` | `Test123!` |
 | Viewer | `viewer@test.com` | `Test123!` |
 
-These are seeded automatically on first backend startup — no manual setup required. There is no signup UI; these three accounts are the only way to log in.
+These are seeded automatically on first backend startup - no manual setup required. There is no signup UI; these three accounts are the only way to log in.
 
 ## Project Structure
 
@@ -180,4 +180,4 @@ See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) for the full, verified list. Hi
 
 ## License
 
-All Rights Reserved — see [LICENSE](LICENSE). This repository is public for portfolio and demonstration purposes only; no reuse, modification, or redistribution is permitted without written permission. All patient data referenced is synthetic. Not for use with real patient data without proper HIPAA compliance review.
+All Rights Reserved - see [LICENSE](LICENSE). This repository is public for portfolio and demonstration purposes only; no reuse, modification, or redistribution is permitted without written permission. All patient data referenced is synthetic. Not for use with real patient data without proper HIPAA compliance review.

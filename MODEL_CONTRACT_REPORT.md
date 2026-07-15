@@ -1,4 +1,4 @@
-# Model Contract Report — Healthcare Readmission Prediction
+# Model Contract Report - Healthcare Readmission Prediction
 
 ## Root Cause
 
@@ -99,8 +99,8 @@ The backend API route (`predictions.py`) passes `request.features` to the predic
 ## Inference Contract
 
 The prediction service (`services/prediction/main.py`) loads the model and either:
-1. Transforms features through the pipeline (if loaded) — **not compatible with this model**
-2. Falls back to raw numpy array from dict values — **used for this model**
+1. Transforms features through the pipeline (if loaded) - **not compatible with this model**
+2. Falls back to raw numpy array from dict values - **used for this model**
 
 The fallback path requires the feature dict keys to be in the exact order of `model.feature_names_in_`.
 
@@ -133,8 +133,8 @@ The fallback path requires the feature dict keys to be in the exact order of `mo
 ## Remaining Limitations
 
 1. Prediction can only be fully verified with the real Docker environment running (backend API + prediction service + model)
-2. The FeaturePipeline (`ml/features/pipeline.py`) defines 26 features but is incompatible with the packaged model — this should be resolved in a future training cycle
-3. The model artifact is named `random_forest.pkl` with no version suffix — future models should use versioned filenames (e.g., `random_forest_v1.pkl`, `random_forest_v2.pkl`)
+2. The FeaturePipeline (`ml/features/pipeline.py`) defines 26 features but is incompatible with the packaged model - this should be resolved in a future training cycle
+3. The model artifact is named `random_forest.pkl` with no version suffix - future models should use versioned filenames (e.g., `random_forest_v1.pkl`, `random_forest_v2.pkl`)
 4. Browser verification not executed (requires Docker + browser)
 
 ## Recommendation

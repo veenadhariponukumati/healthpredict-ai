@@ -1,4 +1,4 @@
-# Clinical Readmission Prediction & AI Care Coordination Platform
+# Clinical Re-admission Prediction & AI Care Co-ordination Platform
 
 ## Complete Architecture Design Suite
 
@@ -22,7 +22,7 @@ This directory contains the full architecture, engineering design, and product s
 | 10 | [docs/EXPERIMENT_TRACKING.md](EXPERIMENT_TRACKING.md) | ~9K | MLflow config, run structure, registry transitions, reproducibility |
 | 11 | [docs/TESTING_STRATEGY.md](TESTING_STRATEGY.md) | ~22K | 75/20/5 pyramid, unit/integration/ML/workflow/E2E tests, 90% coverage targets |
 | 12 | [docs/DEVELOPER_ONBOARDING.md](DEVELOPER_ONBOARDING.md) | ~12K | 6-step setup, project tree, key commands, troubleshooting |
-| 13 | [docs/INDEX.md](INDEX.md) | ~6K | This index — document map, requirement coverage, architecture freeze |
+| 13 | [docs/INDEX.md](INDEX.md) | ~6K | This index - document map, requirement coverage, architecture freeze |
 
 ---
 
@@ -78,4 +78,4 @@ As of **2026-07-20**, the architecture is **frozen**. All 16 ADRs, 13 documents,
 
 **Total documentation:** ~241KB across 13 markdown files (272KB on disk including supporting files).
 
-**Next phase:** Implementation — begin with protocol interface definitions, then adapter implementations, then business logic across all services.
+**Next phase:** Implementation - begin with protocol interface definitions, then adapter implementations, then business logic across all services.

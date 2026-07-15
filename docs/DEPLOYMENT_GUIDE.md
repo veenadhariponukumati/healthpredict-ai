@@ -1,6 +1,6 @@
 # Deployment Guide
 
-> **Scope note:** This guide describes a *designed* Azure deployment path. None of it has been implemented — there is no `.github/workflows/` directory, no Bicep/Terraform files, and no frontend `Dockerfile` in this repository. The only deployment path that has been built and verified is local Docker Compose (`backend/docker-compose.local.yml`, 8 services) plus `npm run dev`/`npm run build` for the frontend. Treat everything below as a proposed target architecture, not current capability.
+> **Scope note:** This guide describes a *designed* Azure deployment path. None of it has been implemented - there is no `.github/workflows/` directory, no Bicep/Terraform files, and no frontend `Dockerfile` in this repository. The only deployment path that has been built and verified is local Docker Compose (`backend/docker-compose.local.yml`, 8 services) plus `npm run dev`/`npm run build` for the frontend. Treat everything below as a proposed target architecture, not current capability.
 
 ## Architecture Overview
 
@@ -117,7 +117,7 @@ az group create --name rg-readmission-prod --location eastus2
 ### Core Services (Bicep)
 
 ```bicep
-// main.bicep — key resources
+// main.bicep - key resources
 param location string = 'eastus2'
 param environment string = 'prod'
 
@@ -559,10 +559,10 @@ scrape_configs:
 
 ### Grafana Dashboards
 
-1. **Service Health Dashboard** — Uptime, latency, error rates per service
-2. **ML Performance Dashboard** — Model metrics, drift detection, prediction distribution
-3. **Workflow Dashboard** — Workflow volume, success/failure rates, duration
-4. **Infrastructure Dashboard** — CPU, memory, disk, network per container
+1. **Service Health Dashboard** - Uptime, latency, error rates per service
+2. **ML Performance Dashboard** - Model metrics, drift detection, prediction distribution
+3. **Workflow Dashboard** - Workflow volume, success/failure rates, duration
+4. **Infrastructure Dashboard** - CPU, memory, disk, network per container
 
 ## Disaster Recovery
 

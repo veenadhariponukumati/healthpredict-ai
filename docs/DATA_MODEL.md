@@ -404,13 +404,13 @@ CREATE INDEX idx_feature_labeled ON feature_store(is_labeled) WHERE is_labeled =
 
 | Table | Row Size | 1M Rows | 10M Rows | 100M Rows |
 |-------|----------|---------|----------|-----------|
-| users | ~500B | 0.5 GB | — | — |
-| patients | ~2KB | 2 GB | 20 GB | — |
+| users | ~500B | 0.5 GB | - | - |
+| patients | ~2KB | 2 GB | 20 GB | - |
 | predictions | ~4KB | 4 GB | 40 GB | 400 GB |
 | workflow_events | ~2KB | 2 GB | 20 GB | 200 GB |
 | audit_logs | ~1KB | 1 GB | 10 GB | 100 GB |
-| model_versions | ~2KB | — | — | — |
-| feature_store | ~3KB | 3 GB | 30 GB | — |
+| model_versions | ~2KB | - | - | - |
+| feature_store | ~3KB | 3 GB | 30 GB | - |
 
 ## Migration Strategy
 

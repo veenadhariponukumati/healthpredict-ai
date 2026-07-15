@@ -1,8 +1,8 @@
-# Stabilization Report — Healthcare Readmission Prediction Platform
+# Stabilization Report - Healthcare Readmission Prediction Platform
 
 ## 1. Session Persistence Breaks
 
-**Root cause:** Frontend auth provider (`auth-provider.tsx`) called `authApi.me()` on mount, which hit `/api/v1/auth/me` — an endpoint that does not exist in the backend. The rejected promise cleared the stored session on every page refresh.
+**Root cause:** Frontend auth provider (`auth-provider.tsx`) called `authApi.me()` on mount, which hit `/api/v1/auth/me` - an endpoint that does not exist in the backend. The rejected promise cleared the stored session on every page refresh.
 
 **Evidence:** 
 - `auth-provider.tsx` line 80: `authApi.me().catch(() => { /* clear session */ })`
@@ -151,7 +151,7 @@ func.case((Prediction.risk_level == "HIGH", 1), else_=0)
 
 ## Backend Changes
 
-One backend file was modified: `backend/app/db/repositories/prediction_repository.py` — fixed `func.case()` → `case()`. No API contracts were changed.
+One backend file was modified: `backend/app/db/repositories/prediction_repository.py` - fixed `func.case()` → `case()`. No API contracts were changed.
 
 ## Frontend Build
 
@@ -162,7 +162,7 @@ One backend file was modified: `backend/app/db/repositories/prediction_repositor
 
 ## Browser Verification
 
-**NOT EXECUTED** — requires running backend Docker + frontend dev server + browser environment.
+**NOT EXECUTED** - requires running backend Docker + frontend dev server + browser environment.
 
 ## Playwright Results
 

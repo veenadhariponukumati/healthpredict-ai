@@ -1,4 +1,4 @@
-# Local Setup Guide — Healthcare Readmission Prediction Platform
+# Local Setup Guide - Healthcare Readmission Prediction Platform
 
 ## Prerequisites
 

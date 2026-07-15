@@ -1,4 +1,4 @@
-# Model Card: Clinical Readmission Predictor
+# Model Card: Clinical Re-admission Predictor
 
 ## Model Overview
 
@@ -7,7 +7,7 @@
 | **Model Name** | `readmission-predictor` |
 | **Model Type** | Ensemble (Best-of-Four) |
 | **Version** | 3.2.1 (Production) |
-| **Task** | Binary classification — 30-day hospital readmission prediction |
+| **Task** | Binary classification - 30-day hospital readmission prediction |
 | **Framework** | Scikit-learn 1.4 + PyTorch 2.2 + XGBoost 2.0 |
 | **MLflow Experiment** | `readmission-training-v3` (ID: 42) |
 | **Training Date** | 2026-07-10 |
@@ -26,11 +26,11 @@ Predict the probability that a hospitalized patient will be readmitted within 30
 - Population health management platforms
 
 ### Out of Scope
-- **Not a clinical diagnostic tool** — Does not diagnose conditions or recommend treatments
-- **Not for real-time emergency decision-making** — Designed for discharge planning, not acute care
-- **Not for pediatric patients** — Model trained on adult population (age 18+)
-- **Not for psychiatric admissions** — Different readmission dynamics
-- **Not for patients with < 24h length of stay** — Insufficient data for meaningful prediction
+- **Not a clinical diagnostic tool** - Does not diagnose conditions or recommend treatments
+- **Not for real-time emergency decision-making** - Designed for discharge planning, not acute care
+- **Not for pediatric patients** - Model trained on adult population (age 18+)
+- **Not for psychiatric admissions** - Different readmission dynamics
+- **Not for patients with < 24h length of stay** - Insufficient data for meaningful prediction
 
 ## Model Architecture
 
@@ -43,7 +43,7 @@ Predict the probability that a hospitalized patient will be readmitted within 30
 | **XGBoost** 🔥 | **LR=0.05, depth=6, 300 estimators** | **0.845** | **0.912** | **42ms** |
 | PyTorch NN | 3 layers, 256-128-64, dropout 0.3 | 0.802 | 0.876 | 38ms |
 
-🔥 **Production model** — XGBoost selected by weighted scoring (see [ARCHITECTURE.md](ARCHITECTURE.md#32-model-comparison-framework))
+🔥 **Production model** - XGBoost selected by weighted scoring (see [ARCHITECTURE.md](ARCHITECTURE.md#32-model-comparison-framework))
 
 ### Final Model: XGBoost
 
@@ -129,7 +129,7 @@ Actual Positive          105                524
 
 - **True Negatives:** 4,859
 - **False Positives:** 812 (1.5x precision improvement target)
-- **False Negatives:** 105 (key metric — minimizing missed high-risk patients)
+- **False Negatives:** 105 (key metric - minimizing missed high-risk patients)
 - **True Positives:** 524
 
 ### Threshold Analysis
@@ -142,7 +142,7 @@ Actual Positive          105                524
 | 0.40 | 0.87 | 0.82 | 0.84 | 0.03 |
 | 0.50 | 0.92 | 0.71 | 0.80 | 0.01 |
 
-🔥 **Production threshold** — Maximizes F1 while maintaining recall ≥ 0.85
+🔥 **Production threshold** - Maximizes F1 while maintaining recall ≥ 0.85
 
 ### Calibration
 

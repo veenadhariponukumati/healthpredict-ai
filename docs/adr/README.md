@@ -230,8 +230,8 @@ Stateless authentication is required for horizontally scaled services. Any insta
 Use JWT with RS256 (RSA signature) asymmetric signing. The private key signs tokens (auth service only), and the public key is distributed to all services for verification. Access tokens expire in 15 minutes; refresh tokens (HTTP-only secure cookies) expire in 7 days.
 
 ### Consequences
-- **Positive:** Stateless — any service instance can verify tokens without DB lookup
-- **Positive:** Asymmetric keys — public key can be safely distributed
+- **Positive:** Stateless - any service instance can verify tokens without DB lookup
+- **Positive:** Asymmetric keys - public key can be safely distributed
 - **Positive:** Standard library support (PyJWT, jose)
 - **Negative:** Token revocation requires a blacklist (Redis set of revoked JWT IDs)
 - **Negative:** Larger token size than session cookies (~1KB)
@@ -271,15 +271,15 @@ The architecture directly depends on vendor-specific SDKs (MLflow, Azure OpenAI,
 Every third-party integration is hidden behind a Python `Protocol` (interface) defined in a shared `interfaces` module. Business logic imports only the protocol. Implementation classes live in `adapters/` subdirectories. Dependency injection in each service's `container.py` wires implementations at startup based on configuration.
 
 **Interfaces defined:**
-- `FeatureStoreProtocol` — Feature storage/retrieval (implementations: PostgreSQL, Feast, Redis)
-- `ModelRegistryProtocol` — Model versioning and promotion (implementations: MLflow, S3, GCS)
-- `LLMProviderProtocol` — Natural language explanation generation (implementations: Azure OpenAI, OpenAI, Anthropic, TemplateFallback)
-- `MessageQueueProtocol` — Async event publishing (implementations: Redis PubSub, RabbitMQ, SQS)
-- `NotificationProviderProtocol` — Multi-channel notification delivery (implementations: SMTP, Twilio, SendGrid, Slack)
-- `ObjectStorageProtocol` — Blob storage for artifacts (implementations: Azure Blob, S3, GCS)
+- `FeatureStoreProtocol` - Feature storage/retrieval (implementations: PostgreSQL, Feast, Redis)
+- `ModelRegistryProtocol` - Model versioning and promotion (implementations: MLflow, S3, GCS)
+- `LLMProviderProtocol` - Natural language explanation generation (implementations: Azure OpenAI, OpenAI, Anthropic, TemplateFallback)
+- `MessageQueueProtocol` - Async event publishing (implementations: Redis PubSub, RabbitMQ, SQS)
+- `NotificationProviderProtocol` - Multi-channel notification delivery (implementations: SMTP, Twilio, SendGrid, Slack)
+- `ObjectStorageProtocol` - Blob storage for artifacts (implementations: Azure Blob, S3, GCS)
 
 ### Consequences
-- **Positive:** Any vendor can be replaced by implementing the protocol — zero business logic changes
+- **Positive:** Any vendor can be replaced by implementing the protocol - zero business logic changes
 - **Positive:** Testing: mock protocols directly without vendor SDKs
 - **Positive:** Multiple implementations can coexist (primary + fallback + circuit breaker)
 - **Positive:** Circuit breaker pattern wraps any provider protocol automatically
@@ -364,9 +364,9 @@ The platform depends on multiple external services (Azure OpenAI, MLflow, Postgr
 
 ### Decision
 Every external dependency has a documented graceful degradation strategy with three tiers:
-1. **Retry** — Transient failure recovery with exponential backoff
-2. **Fallback** — Alternative code path when the primary is unavailable (e.g., template-based LLM, local model cache, local feature cache)
-3. **Dead-Letter** — Structured failure handling when all retries and fallbacks are exhausted
+1. **Retry** - Transient failure recovery with exponential backoff
+2. **Fallback** - Alternative code path when the primary is unavailable (e.g., template-based LLM, local model cache, local feature cache)
+3. **Dead-Letter** - Structured failure handling when all retries and fallbacks are exhausted
 
 Circuit breaker patterns wrap all external providers. Detection, fallback, recovery, alerting, and metrics are documented for every dependency in the Failure Handling Matrix (see `ENTERPRISE_REVIEW.md §6.1`).
 
