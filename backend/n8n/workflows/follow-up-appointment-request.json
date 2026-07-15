@@ -1,0 +1,105 @@
+{
+  "active": false,
+  "name": "Follow-up Appointment Request",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "follow-up-appointment-request",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "fbdb9c95-d5a1-4363-94bd-32415ae12048"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.workflow_id }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.body.patient_id }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"action\": \"appointment_request\",\n  \"status\": \"rejected\",\n  \"error\": \"Missing required fields: workflow_id, patient_id\"\n}"
+      },
+      "name": "Reject",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "$json.execution_id = 'n8n-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 8);\nreturn $json;"
+      },
+      "name": "Add Execution ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [550, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"execution_id\": \"{{ $json.execution_id }}\",\n  \"action\": \"appointment_request\",\n  \"status\": \"scheduled\",\n  \"timestamp\": \"{{ $now.toISO() }}\",\n  \"mock\": {\n    \"department\": \"Cardiology Follow-up\",\n    \"suggested_date\": \"{{ $now.plus(7).toISO() }}\",\n    \"priority\": \"high\",\n    \"patient_id\": \"{{ $json.body.patient_id }}\"\n  }\n}"
+      },
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json['X-Integration-Secret'] || $json.headers?.x_integration_secret || $json.headers?.['x-integration-secret'] || '' }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Check Auth",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [350, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Check Auth", "type": "main", "index": 0}]]
+    },
+    "Check Auth": {
+      "main": [
+        [{"node": "Validate Input", "type": "main", "index": 0}],
+        [{"node": "Reject", "type": "main", "index": 0}]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [{"node": "Add Execution ID", "type": "main", "index": 0}],
+        [{"node": "Reject", "type": "main", "index": 0}]
+      ]
+    },
+    "Add Execution ID": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {}
+}

@@ -1,0 +1,165 @@
+# Local development — automation MVP with n8n + Temporal
+# Usage: docker compose -f docker-compose.local.yml up -d --build
+version: "3.9"
+services:
+  # ── Database ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: readmission
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: dev_password
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d readmission"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ── API Gateway (Port 8000) ───────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://app:dev_password@postgres:5432/readmission"
+      DATABASE_SYNC_URL: "postgresql://app:dev_password@postgres:5432/readmission"
+      JWT_SECRET_KEY: "dev-secret-change-in-production"
+      JWT_ALGORITHM: "HS256"
+      PREDICTION_SERVICE_URL: "http://prediction:8001"
+      WORKFLOW_SERVICE_URL: "http://workflow:8004"
+      LOG_LEVEL: "INFO"
+      ENVIRONMENT: "development"
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── Prediction Service (Port 8001) ────────────────────────────────
+  prediction:
+    build:
+      context: .
+      dockerfile: services/prediction/Dockerfile
+    ports: ["8001:8001"]
+    environment:
+      LOG_LEVEL: INFO
+    volumes:
+      - model_cache:/models
+    restart: unless-stopped
+
+  # ── Workflow Service (Port 8004) ──────────────────────────────────
+  workflow:
+    build:
+      context: .
+      dockerfile: services/workflow/Dockerfile
+    ports: ["8004:8004"]
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://app:dev_password@postgres:5432/readmission"
+      TEMPORAL_HOST: "temporal:7233"
+      TEMPORAL_TASK_QUEUE: "care-coordination"
+      RETRY_INITIAL_INTERVAL: "5"
+      RETRY_BACKOFF: "2.0"
+      RETRY_MAX_INTERVAL: "60"
+      RETRY_MAX_ATTEMPTS: "3"
+      LOG_LEVEL: INFO
+    depends_on:
+      postgres: { condition: service_healthy }
+      temporal: { condition: service_started }
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── n8n (Port 5678) ───────────────────────────────────────────────
+  n8n:
+    build:
+      context: ./n8n
+      dockerfile: Dockerfile
+    ports: ["5678:5678"]
+    environment:
+      N8N_HOST: "localhost"
+      N8N_PORT: 5678
+      N8N_PROTOCOL: "http"
+      N8N_METRICS: "false"
+      DB_TYPE: "postgresdb"
+      DB_POSTGRESDB_HOST: "postgres"
+      DB_POSTGRESDB_DATABASE: "n8n"
+      DB_POSTGRESDB_USER: "app"
+      DB_POSTGRESDB_PASSWORD: "dev_password"
+      N8N_INTEGRATION_SECRET: "${N8N_INTEGRATION_SECRET:-dev-integration-secret}"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/.n8n/workflows
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:5678/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── Temporal Server (Port 7233) ───────────────────────────────────
+  temporal:
+    image: temporalio/auto-setup:1.23
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    environment:
+      DB: "postgresql"
+      DB_PORT: "5432"
+      POSTGRES_USER: "app"
+      POSTGRES_PWD: "dev_password"
+      POSTGRES_SEEDS: "postgres"
+      DYNAMIC_CONFIG_FILE_PATH: "/etc/temporal/config/dynamicconfig/docker.yaml"
+    volumes:
+      - temporal_data:/etc/temporal/data
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "temporal:7233", "cluster", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  # ── Temporal Admin/UI (Port 8088) ─────────────────────────────────
+  temporal-ui:
+    image: temporalio/ui:latest
+    ports: ["8088:8080"]
+    environment:
+      TEMPORAL_ADDRESS: "temporal:7233"
+      TEMPORAL_CORS_ORIGINS: "http://localhost:8088"
+    depends_on:
+      temporal: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── Temporal Worker ────────────────────────────────────────────────
+  temporal-worker:
+    build:
+      context: .
+      dockerfile: services/temporal_worker/Dockerfile
+    environment:
+      TEMPORAL_HOST: "temporal:7233"
+      TEMPORAL_TASK_QUEUE: "care-coordination"
+      DATABASE_URL: "postgresql+asyncpg://app:dev_password@postgres:5432/readmission"
+      N8N_BASE_URL: "http://n8n:5678/webhook"
+      N8N_INTEGRATION_SECRET: "${N8N_INTEGRATION_SECRET:-dev-integration-secret}"
+      LOG_LEVEL: INFO
+      PYTHONPATH: "/app"
+    depends_on:
+      temporal: { condition: service_healthy }
+      n8n: { condition: service_started }
+      postgres: { condition: service_healthy }
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  model_cache:
+  n8n_data:
+  temporal_data:

@@ -1,0 +1,160 @@
+# ── Clinical Readmission Prediction Platform RC1 ────────────────────
+version: "3.9"
+
+services:
+  # ── Database ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: readmission
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: dev_password
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d readmission"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── API Gateway (Port 8000) ───────────────────────────────────────
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: ["8000:8000"]
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: "postgresql+asyncpg://app:dev_password@postgres:5432/readmission"
+      DATABASE_SYNC_URL: "postgresql://app:dev_password@postgres:5432/readmission"
+      JWT_SECRET_KEY: "dev-secret-key-do-not-use-in-production"
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      LOG_LEVEL: INFO
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── Prediction Service (Port 8001) ────────────────────────────────
+  prediction-service:
+    build:
+      context: .
+      dockerfile: services/prediction/Dockerfile
+    ports: ["8001:8001"]
+    environment:
+      LOG_LEVEL: INFO
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+    volumes:
+      - model_cache:/models
+    depends_on:
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── Training Service (Port 8002) ──────────────────────────────────
+  training-service:
+    build:
+      context: .
+      dockerfile: services/training/Dockerfile
+    ports: ["8002:8002"]
+    environment:
+      LOG_LEVEL: INFO
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+    volumes:
+      - model_cache:/models
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── LLM Service (Port 8003) ───────────────────────────────────────
+  llm-service:
+    build:
+      context: .
+      dockerfile: services/llm/Dockerfile
+    ports: ["8003:8003"]
+    environment:
+      AZURE_OPENAI_ENDPOINT: "${AZURE_OPENAI_ENDPOINT:-}"
+      AZURE_OPENAI_API_KEY: "${AZURE_OPENAI_API_KEY:-}"
+      AZURE_OPENAI_DEPLOYMENT: "gpt-4o"
+      LOG_LEVEL: INFO
+    restart: unless-stopped
+
+  # ── Workflow Service (Port 8004) ──────────────────────────────────
+  workflow-service:
+    build:
+      context: .
+      dockerfile: services/workflow/Dockerfile
+    ports: ["8004:8004"]
+    environment:
+      N8N_WEBHOOK_URL: "http://n8n:5678/webhook"
+      TEMPORAL_HOST: "temporal:7233"
+      LOG_LEVEL: INFO
+    depends_on:
+      - n8n
+      - temporal
+    restart: unless-stopped
+
+  # ── MLflow (Port 5000) ────────────────────────────────────────────
+  mlflow:
+    build:
+      context: .
+      dockerfile: mlflow/Dockerfile
+    ports: ["5000:5000"]
+    environment:
+      MLFLOW_TRACKING_URI: "postgresql://app:dev_password@postgres:5432/readmission"
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── n8n (Port 5678) ───────────────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    ports: ["5678:5678"]
+    environment:
+      N8N_HOST: "localhost"
+      N8N_PORT: 5678
+      N8N_PROTOCOL: "http"
+      DB_TYPE: "postgresdb"
+      DB_POSTGRESDB_HOST: "postgres"
+      DB_POSTGRESDB_DATABASE: "readmission"
+      DB_POSTGRESDB_USER: "app"
+      DB_POSTGRESDB_PASSWORD: "dev_password"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/.n8n/workflows
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ── Temporal (Port 7233) ──────────────────────────────────────────
+  temporal:
+    image: temporalio/auto-setup:1.23
+    ports: ["7233:7233"]
+    environment:
+      DB: "postgresql"
+      POSTGRES_USER: "app"
+      POSTGRES_PWD: "dev_password"
+      POSTGRES_SEEDS: "postgres"
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  mlflow_artifacts:
+  model_cache:
+  n8n_data:

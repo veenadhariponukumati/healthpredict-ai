@@ -1,0 +1,4 @@
+temporalio>=1.7.0
+httpx>=0.28.0
+sqlalchemy[asyncio]>=2.0.30
+asyncpg>=0.29.0

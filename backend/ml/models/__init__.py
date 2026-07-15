@@ -1,0 +1,1 @@
+"""Model definitions for all 4 candidate architectures."""

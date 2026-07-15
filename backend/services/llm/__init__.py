@@ -1,0 +1,1 @@
+"""LLM Service — Azure OpenAI explanation generation."""

@@ -1,0 +1,25 @@
+{
+  "active": false,
+  "name": "Log Workflow",
+  "nodes": [
+    {
+      "parameters": {"path": "log-workflow"},
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "1c4dcf61-a43d-4216-b9ef-1674275b4cbf"
+    },
+    {
+      "parameters": {"respondWith": "json", "responseBody": "={\"logged\": true}"},
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Respond", "type": "main", "index": 0}]]}
+  },
+  "settings": {}
+}

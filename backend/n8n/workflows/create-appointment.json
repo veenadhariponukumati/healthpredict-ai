@@ -1,0 +1,28 @@
+{
+  "active": false,
+  "name": "Create Appointment",
+  "nodes": [
+    {
+      "parameters": {"path": "create-appointment"},
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "6eab6be3-aad0-4f13-987e-b55b4c88d1af"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"appointment_id\": \"{{ $json.appointment_id }}\",\n  \"date\": \"{{ $json.date }}\",\n  \"status\": \"scheduled\"\n}"
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Respond", "type": "main", "index": 0}]]}
+  },
+  "settings": {}
+}

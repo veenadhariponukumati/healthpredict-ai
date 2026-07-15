@@ -1,0 +1,28 @@
+{
+  "active": false,
+  "name": "Notify Care Team",
+  "nodes": [
+    {
+      "parameters": {"path": "notify-care-team"},
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "eb4ab039-035d-4899-8c7c-5bf6ca0bf59d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"notifications_sent\": true,\n  \"physician_notified\": true,\n  \"coordinator_notified\": true\n}"
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Respond", "type": "main", "index": 0}]]}
+  },
+  "settings": {}
+}
