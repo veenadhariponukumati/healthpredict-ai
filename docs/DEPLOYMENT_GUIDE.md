@@ -1,5 +1,7 @@
 # Deployment Guide
 
+> **Scope note:** This guide describes a *designed* Azure deployment path. None of it has been implemented — there is no `.github/workflows/` directory, no Bicep/Terraform files, and no frontend `Dockerfile` in this repository. The only deployment path that has been built and verified is local Docker Compose (`backend/docker-compose.local.yml`, 8 services) plus `npm run dev`/`npm run build` for the frontend. Treat everything below as a proposed target architecture, not current capability.
+
 ## Architecture Overview
 
 ```mermaid

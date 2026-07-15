@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

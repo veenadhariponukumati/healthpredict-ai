@@ -44,6 +44,10 @@ docker compose -f docker-compose.local.yml up -d --build
 # API is at http://localhost:8000
 ```
 
+## Frontend
+
+The backend steps above do not start the frontend. See [frontend/INTEGRATION_README.md](frontend/INTEGRATION_README.md) for frontend setup (`npm install` / `npm run dev`, served on port 3000).
+
 ## Services
 
 | Service | Port | URL |
@@ -78,6 +82,8 @@ See `.env.example` for all required variables. Key ones:
 # After starting services, run:
 ./scripts/verify-local.sh
 ```
+
+> **Known issue:** this script fails immediately on machines without a native `pg_isready` binary installed (its first check runs `pg_isready` against the host rather than inside the `postgres` container), even when Postgres itself is running correctly in Docker. See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) for details and a manual alternative.
 
 ## Architecture
 

@@ -1,10 +1,7 @@
 # Frontend Integration Package
 
 ## Location
-`frontend/` inside the project root:
-```
-release_v2_extracted/healthcare-platform-release/frontend/
-```
+`frontend/` at the project root, alongside `backend/` and `docs/`.
 
 ## Required Environment Variables
 
@@ -12,7 +9,11 @@ release_v2_extracted/healthcare-platform-release/frontend/
 |----------|-------|---------|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API base URL |
 
-Only one variable is needed. Already created as `.env.local`.
+Only one variable is needed. **`.env.local` is not included in the package** — you must create it yourself if you want to set this explicitly:
+```bash
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > frontend/.env.local
+```
+If you skip this step, `frontend/src/services/api.ts` falls back to the same value (`http://localhost:8000`), so the app still works against a locally-run backend without it.
 
 ## Startup Commands
 
@@ -61,24 +62,14 @@ The frontend is NOT added to docker-compose.local.yml — it runs standalone on 
 - `frontend/src/app/workflows/page.tsx` — Replaced `stats.active` with `stats.running`. Added `retrying` and `escalated` to chart. `completion_rate` now computed as ratio of completed/total
 
 ### Added:
-- `frontend/.env.local` — `NEXT_PUBLIC_API_URL=http://localhost:8000`
-- `frontend/e2e/healthcare.spec.ts` — 11 Playwright E2E tests
+- `frontend/e2e/healthcare.spec.ts` — Playwright E2E tests
 - `frontend/INTEGRATION_README.md` — This file
 
 ## Known Limitations
 
-1. **No E2E browser execution yet**
-   Playwright tests are defined but NOT executed — requires both backend Docker and frontend running simultaneously, plus a browser environment.
+Playwright is now a proper `devDependency` and the full suite has been executed successfully (see the project root's [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md) for the current, verified list of remaining limitations).
 
-2. **Tests are not yet installed**
-   Playwright and its dependencies need to be installed:
-   ```bash
-   cd frontend
-   npm install -D @playwright/test
-   npx playwright install chromium
-   ```
-
-3. **Dashboard Risk Distribution PieChart** uses a simplified label (name + count) instead of percentage because the Recharts `PieLabel` type does not guarantee `percent` is defined on the label render props.
+1. **Dashboard Risk Distribution PieChart** uses a simplified label (name + count) instead of percentage because the Recharts `PieLabel` type does not guarantee `percent` is defined on the label render props.
 
 ## Future Improvements
 
@@ -98,6 +89,6 @@ The frontend is NOT added to docker-compose.local.yml — it runs standalone on 
 | ENV variables documented | ✅ 1 variable |
 | Frontend port | 3000 |
 | Backend port | 8000 |
-| Playwright tests created | ✅ 11 tests |
-| Playwright tests executed | ❌ NOT VERIFIED |
-| Browser quality check | ❌ NOT VERIFIED |
+| Playwright tests created | ✅ 14 tests (3 setup logins + 11 suite tests) |
+| Playwright tests executed | ✅ 14/14 passed |
+| Browser quality check | ✅ verified (no console errors, no hydration warnings) |

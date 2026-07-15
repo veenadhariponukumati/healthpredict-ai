@@ -15,3 +15,7 @@ test-results/
 playwright-report/
 tsconfig.tsbuildinfo
 frontend/e2e/.auth/
+.vscode/
+.idea/
+*.log
+desktop.ini

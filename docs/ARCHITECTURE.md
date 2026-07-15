@@ -1,5 +1,7 @@
 # System Architecture
 
+> **Scope note:** This document describes the full designed architecture, including services scaffolded in code but not part of the verified, runnable local stack. The verified `backend/docker-compose.local.yml` stack is exactly 8 containers: `postgres`, `api`, `prediction`, `workflow`, `n8n`, `temporal`, `temporal-ui`, `temporal-worker`. The **Training Service, LLM Service (Azure OpenAI), MLflow, and Redis** described below exist as code/interfaces but are not wired into that verified stack — there is no MLflow tracking URI or Azure OpenAI config in `backend/.env.example`, and the prediction service runs from a bundled model file rather than an MLflow registry. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
+
 ## 1. Architecture Overview
 
 ### 1.1 High-Level Architecture Diagram

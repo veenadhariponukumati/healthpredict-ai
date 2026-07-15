@@ -1,5 +1,7 @@
 # Enterprise Architecture Review
 
+> **Scope note:** This document describes a *designed*, larger-scale target architecture — its own closing section states "Next phase: Implementation." It does not describe the verified v1.0 system. Concretely, the verified codebase uses a 12-feature model contract (not the 44 features referenced throughout this review), has no Optuna hyperparameter search, no Great Expectations data validation, no continuous retraining pipeline, no batch prediction endpoint, no PagerDuty alerting, and no Grafana cost dashboard. The protocol/interface abstraction layer (Section 1) exists only partially in code (e.g. a `FeatureStoreProtocol`-style interface is present for some adapters), not with the full set of swappable implementations listed here. Treat this document as a proposed future architecture, not current capability. See [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md).
+
 ## Strengthening Production Readiness, Maintainability, Reliability, and Operational Excellence
 
 **Review Date:** 2026-07-20
