@@ -17,10 +17,6 @@ This architecture is designed to the standards of enterprise healthcare technolo
 - Patient management, prediction history, and audit logging
 - Playwright E2E test suite (14 tests) covering auth, RBAC, and core flows
 
-## Screenshots
-
-_Add screenshots here before publishing - see the Release Asset Checklist in the project's release notes. Suggested captures: login screen, dashboard, patient list, prediction detail with SHAP chart, workflow detail, audit log._
-
 ## Architecture at a Glance
 
 ```
