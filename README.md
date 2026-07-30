@@ -4,7 +4,7 @@
 
 Hospital readmissions within 30 days are a major cost and quality problem for health systems - they trigger CMS reimbursement penalties and often signal gaps in post-discharge care. This platform predicts which patients are at high risk of readmission at discharge time, explains *why* using SHAP, and automatically kicks off a durable, auditable care-coordination workflow (Temporal + n8n) so at-risk patients don't fall through the cracks. All data used is synthetic/demo data - no real patient data is processed.
 
-This architecture is designed to the standards of enterprise healthcare technology at scale - Microsoft, Google, Amazon, and Epic-level engineering rigor, with HIPAA-aware patterns, observability, MLOps, and explainable AI throughout.
+This architecture follows enterprise healthcare engineering patterns: HIPAA-aware access control, observability, MLOps, and explainable AI throughout. See "What's real vs. simulated" below for exactly what's implemented and verified versus scaffolded.
 
 **What's real vs. simulated:** Authentication, RBAC, the prediction pipeline (12-feature model contract), SHAP explanations, audit logging, and the Temporal + n8n workflow orchestration (durable state machine, retries, real HTTP webhook delivery) are fully implemented and verified end-to-end - Temporal orchestration is real, and n8n workflow execution is real. The **final notification step of each workflow is simulated** - n8n's workflows (patient reminders, care-team notifications, and appointment scheduling) all return a hardcoded mock response instead of calling a real SMS/email/scheduling provider (see [Known Limitations](KNOWN_LIMITATIONS.md)). No real text messages, emails, or appointment bookings are sent by this application today.
 
